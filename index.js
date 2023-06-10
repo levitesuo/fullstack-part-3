@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
@@ -5,6 +6,18 @@ const mongoose = require('mongoose')
 const app = express()
 
 morgan.token('type', function (req, res) { return JSON.stringify(req.body) })
+
+
+
+mongoose.set('strictQuery',false)
+mongoose.connect(url)
+
+const personShema = new mongoose.Schema({
+  name: String,
+  number: String,
+})
+
+const Person = mongoose.model('Person', personShema)
 
 app.use(morgan('tiny'), )
 app.use(morgan(':method :url :req[Content-Length] :status - :total-time ms :type', {
@@ -57,11 +70,10 @@ app.post('/api/persons', (request, response) => {
     })
   }
 
-  const person = {
+  const person = new Person ({
     name: body.name,
     number: body.number,
-    id: generateId(),
-  }
+  })
 
   persons = persons.concat(person)
 
@@ -78,7 +90,9 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons)
+  Person.find({}).then(persons => {
+    response.json(persons)
+  })
 })
 
 app.get('/api/persons/:id', (request, response) => {
