@@ -1,6 +1,7 @@
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const mongoose = require('mongoose')
 const app = express()
 
 morgan.token('type', function (req, res) { return JSON.stringify(req.body) })
@@ -9,6 +10,7 @@ app.use(morgan('tiny'), )
 app.use(morgan(':method :url :req[Content-Length] :status - :total-time ms :type', {
   skip: function (req, res) {return req.method !== "POST"}
 }))
+
 app.use(express.json())
 app.use(cors())
 app.use(express.static('build'))
