@@ -1,7 +1,7 @@
 GET http://localhost:3001/api/persons
 
 ###
-GET http://localhost:3001
+GET http://localhost:3001/api/info
 
 ###
 GET http://localhost:3001/api/persons/6482ff41a3ad2e2eedbc736b
@@ -25,6 +25,6 @@ POST http://localhost:3001/api/persons
 Content-Type: application/json
 
 {
-    "name": "",
+    "name": "Jaska Jokunen",
     "number": "313"
 }
