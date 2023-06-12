@@ -5,13 +5,24 @@ if (process.argv.length<3) {
     process.exit(1)
 }
 
-const url = process.env.MONGODB_URI
+const password = process.argv[2]
+
+const url = `mongodb+srv://fullstack:${password}@cluster0.a2ildyd.mongodb.net/phonebookApp?retryWrites=true&w=majority`
 
 mongoose.set('strictQuery',false)
 mongoose.connect(url)
- 
+
+const numberValidator = [(num) => {
+    if (!num.includes("-")) {return false}
+    const { firstNum, secondNum } = num.split('-')
+}, 'The number must be in format ##-#...# or ###-#...#']
+
 const personShema = new mongoose.Schema({
-    name: String,
+    name: {
+        type: String,
+        minLength: 3,
+        required: true
+    },
     number: String,
 })
   

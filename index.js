@@ -22,18 +22,14 @@ const errorHandler = (error, request, response, next) => {
   console.log(error.message)
   if (error.name === 'CastError') {
     return response.status(400).send({error: 'malformed id'})
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
   }
   next(error)
 }
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   const body = request.body
-
-  if (!(body.number && body.name)) {
-    return response.status(400).json({
-      error: 'invalidArgument: Entries must have name and number'
-    })
-  }
 
   const person = new Person ({
     name: body.name,
@@ -43,6 +39,7 @@ app.post('/api/persons', (request, response) => {
     person.save().then(savedInfo => {
       response.json(savedInfo)
     })
+    .catch(error => next(error))
 })
 
 app.get('/api/info',async (request, response) => {
@@ -96,13 +93,14 @@ app.put('/api/persons/:id', (request, response, next) => {
     number: body.number,
   }
 
-  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+  Person.findByIdAndUpdate(request.params.id, person, { new: true ,runValidators: true, context: 'query'})
     .then(updatedPerson => {
       response.json(updatedPerson)
     })
     .catch(error => next(error))
 })
 
+app.use(errorHandler)
 const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
